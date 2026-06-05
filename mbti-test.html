@@ -444,6 +444,26 @@
             }
         ];
         
+        const mbtiAvatars = {
+            "INTJ": "🧠",
+            "INTP": "🔬",
+            "ENTJ": "👑",
+            "ENTP": "💡",
+            "INFJ": "✨",
+            "INFP": "🌈",
+            "ENFJ": "🌟",
+            "ENFP": "🎨",
+            "ISTJ": "📋",
+            "ISFJ": "🛡️",
+            "ESTJ": "📊",
+            "ESFJ": "🤝",
+            "ISTP": "🔧",
+            "ISFP": "🎵",
+            "ESTP": "🚀",
+            "ESFP": "🎉"
+        };
+        
+
         const mbtiTypes = {
             "INTJ": {
                 name: "建筑师",
@@ -511,7 +531,7 @@
             "ENFP": {
                 name: "竞选者",
                 description: "热情、有创造力和社交能力的自由精神者，总能找到微笑的理由。你充满活力，喜欢探索新的可能性。",
-                strengths: ["好奇心", "热情洋溢", "善于交际", "精力充沛", "乐观向上"],
+                strengths: ["好奇心", "热情洋溢", "善于社交", "精力充沛", "乐观向上"],
                 weaknesses: ["不切实际", "难以集中", "过度思考", "容易紧张", "不够独立"],
                 careers: ["记者", "演员", "咨询师", "市场营销", "创业者"],
                 color: "from-amber-500 to-yellow-500",
@@ -564,7 +584,7 @@
             },
             "ISFP": {
                 name: "探险家",
-                description: "灵活有魅力的艺术家，随时准备探索和体验新事物。你温和敏感，热爱美与和谐。",
+                description: "灵活有魅力的艺术家，随时准备探索和体验新事物。你温柔敏感，热爱美与和谐。",
                 strengths: ["有魅力", "敏感", "想象力", "热情", "好奇心"],
                 weaknesses: ["过于独立", "不可预测", "容易紧张", "自尊心低", "难以规划"],
                 careers: ["艺术家", "设计师", "厨师", "摄影师", "理疗师"],
@@ -726,7 +746,7 @@
                                 🎉 测试完成！
                             </div>
                             <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">你是</h1>
-                            <div class="text-7xl md:text-9xl font-extrabold bg-gradient-to-r ${typeData.color} bg-clip-text text-transparent">
+                            <div class="avatar-container mb-6 w-48 h-48 mx-auto avatar-bounce avatar-glow">${mbtiAvatars[type]}</div>
                                 ${type}
                             </div>
                             <p class="text-2xl md:text-3xl font-semibold text-gray-700 mt-4">${typeData.name}</p>
