@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI 性格测试 - 发现真实的你</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        
+        * {
+            font-family: 'Noto Sans SC', 'Poppins', sans-serif;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(139, 92, 246, 0.6); }
+        }
+        
+        @keyframes slide-in-left {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes slide-in-right {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes fade-up {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes bounce-in {
+            0% { opacity: 0; transform: scale(0.3); }
+            50% { opacity: 1; transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c);
+            background-size: 400% 400%;
+            animation: gradient-shift 15s ease infinite;
+        }
+        
+        .slide-in-left {
+            animation: slide-in-left 0.6s ease-out forwards;
+        }
+        
+        .slide-in-right {
+            animation: slide-in-right 0.6s ease-out forwards;
+        }
+        
+        .fade-up {
+            animation: fade-up 0.5s ease-out forwards;
+        }
+        
+        .bounce-in {
+            animation: bounce-in 0.8s ease-out forwards;
+        }
+        
+        .option-btn {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .option-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .option-btn.selected {
+            transform: scale(1.02);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.3), 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .primary-btn {
+            background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+        }
+        
+        .progress-bar {
+            transition: width 0.5s ease-out;
+        }
+        
+        .mbti-letter {
+            display: inline-block;
+            animation: float 2s ease-in-out infinite;
+        }
+        
+        .mbti-letter:nth-child(2) { animation-delay: 0.2s; }
+        .mbti-letter:nth-child(3) { animation-delay: 0.4s; }
+        .mbti-letter:nth-child(4) { animation-delay: 0.6s; }
+        
+        .strength-item::before, .weakness-item::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .strength-item::before {
+            background: linear-gradient(135deg, #10B981, #34D399);
+        }
+        
+        .weakness-item::before {
+            background: linear-gradient(135deg, #F59E0B, #FBBF24);
+        }
+        
+        .type-card {
+            transition: all 0.3s ease;
+        }
+        
+        .type-card:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div id="app" class="min-h-screen">
+        <!-- 首页视图 -->
+        <div id="home-view" class="min-h-screen gradient-bg relative overflow-hidden">
+            <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                <div class="absolute top-20 left-10 w-72 h-72 bg-white/10 rounded-full blur-3xl"></div>
+                <div class="absolute bottom-20 right-10 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl"></div>
+            </div>
+            
+            <div class="relative z-10 container mx-auto px-6 py-12">
+                <div class="max-w-4xl mx-auto text-center text-white">
+                    <div class="mb-8 float-animation">
+                        <span class="text-8xl md:text-9xl font-extrabold tracking-wider">
+                            <span class="mbti-letter">M</span>
+                            <span class="mbti-letter">B</span>
+                            <span class="mbti-letter">T</span>
+                            <span class="mbti-letter">I</span>
+                        </span>
+                    </div>
+                    
+                    <h1 class="text-4xl md:text-6xl font-bold mb-6 fade-up" style="animation-delay: 0.2s;">
+                        发现真实的你
+                    </h1>
+                    
+                    <p class="text-xl md:text-2xl text-white/90 mb-12 max-w-2xl mx-auto fade-up" style="animation-delay: 0.4s;">
+                        只需 20 道题，探索你的性格类型，了解自己的优势与潜能
+                    </p>
+                    
+                    <button onclick="startTest()" class="primary-btn text-white text-xl font-semibold px-12 py-5 rounded-full pulse-glow fade-up" style="animation-delay: 0.6s;">
+                        ✨ 开始测试
+                    </button>
+                </div>
+                
+                <div class="mt-20 grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                    <div class="glass-card rounded-3xl p-8 text-center fade-up" style="animation-delay: 0.8s;">
+                        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-3xl">
+                            🧠
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">科学依据</h3>
+                        <p class="text-gray-600">基于荣格心理学理论，经过广泛验证</p>
+                    </div>
+                    
+                    <div class="glass-card rounded-3xl p-8 text-center fade-up" style="animation-delay: 1s;">
+                        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-3xl">
+                            ⏱️
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">快速便捷</h3>
+                        <p class="text-gray-600">仅需 5 分钟，完成你的性格探索</p>
+                    </div>
+                    
+                    <div class="glass-card rounded-3xl p-8 text-center fade-up" style="animation-delay: 1.2s;">
+                        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center text-3xl">
+                            🔒
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">完全免费</h3>
+                        <p class="text-gray-600">无需注册，保护你的隐私安全</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 测试视图 -->
+        <div id="test-view" class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 hidden">
+            <div class="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200">
+                <div class="container mx-auto px-6 py-4">
+                    <div class="max-w-3xl mx-auto">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-lg font-semibold text-gray-700" id="progress-text">问题 1 / 20</span>
+                            <span class="text-lg font-bold text-purple-600" id="progress-percent">5%</span>
+                        </div>
+                        <div class="h-3 bg-gray-200 rounded-full overflow-hidden">
+                            <div id="progress-bar" class="progress-bar h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" style="width: 5%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="container mx-auto px-6 py-12">
+                <div class="max-w-3xl mx-auto">
+                    <div id="question-container" class="glass-card rounded-3xl p-8 md:p-12 shadow-2xl">
+                        <div class="text-center mb-10">
+                            <span class="inline-block px-4 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold mb-4" id="question-tag">
+                                第 1 题
+                            </span>
+                            <h2 class="text-2xl md:text-3xl font-bold text-gray-800 leading-relaxed" id="question-text">
+                                加载中...
+                            </h2>
+                        </div>
+                        
+                        <div class="space-y-4" id="options-container">
+                        </div>
+                        
+                        <div class="flex justify-between mt-10 pt-6 border-t border-gray-100">
+                            <button onclick="prevQuestion()" id="prev-btn" class="px-6 py-3 text-gray-500 hover:text-gray-700 font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed" disabled>
+                                ← 上一题
+                            </button>
+                            <button onclick="nextQuestion()" id="next-btn" class="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full font-semibold transition-all hover:shadow-lg hover:scale-105 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100" disabled>
+                                下一题 →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 结果视图 -->
+        <div id="result-view" class="min-h-screen hidden">
+            <div id="result-container" class="min-h-screen">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                id: 1,
+                text: "在社交聚会中，你通常会：",
+                options: [
+                    { text: "主动与很多人交谈，感到精力充沛", dimension: "EI", value: 1 },
+                    { text: "只和少数熟悉的人聊天，之后需要休息", dimension: "EI", value: -1 }
+                ]
+            },
+            {
+                id: 2,
+                text: "你更注重：",
+                options: [
+                    { text: "具体的事实和细节", dimension: "SN", value: 1 },
+                    { text: "抽象的概念和可能性", dimension: "SN", value: -1 }
+                ]
+            },
+            {
+                id: 3,
+                text: "做决定时，你更依赖：",
+                options: [
+                    { text: "逻辑分析和客观事实", dimension: "TF", value: 1 },
+                    { text: "个人价值观和对他人的影响", dimension: "TF", value: -1 }
+                ]
+            },
+            {
+                id: 4,
+                text: "面对截止日期，你会：",
+                options: [
+                    { text: "提前规划并早早完成", dimension: "JP", value: 1 },
+                    { text: "享受最后一刻的冲刺感", dimension: "JP", value: -1 }
+                ]
+            },
+            {
+                id: 5,
+                text: "周末休息时，你更想：",
+                options: [
+                    { text: "和朋友外出聚会", dimension: "EI", value: 1 },
+                    { text: "宅在家里放松自己", dimension: "EI", value: -1 }
+                ]
+            },
+            {
+                id: 6,
+                text: "你觉得更容易理解：",
+                options: [
+                    { text: "具体的操作指南", dimension: "SN", value: 1 },
+                    { text: "理论性的概念解释", dimension: "SN", value: -1 }
+                ]
+            },
+            {
+                id: 7,
+                text: "批评别人时，你：",
+                options: [
+                    { text: "直接指出问题，不太在意对方感受", dimension: "TF", value: 1 },
+                    { text: "会考虑对方感受，委婉表达", dimension: "TF", value: -1 }
+                ]
+            },
+            {
+                id: 8,
+                text: "你的工作/学习环境通常是：",
+                options: [
+                    { text: "井井有条，一切有序", dimension: "JP", value: 1 },
+                    { text: "随性摆放，乱中有序", dimension: "JP", value: -1 }
+                ]
+            },
+            {
+                id: 9,
+                text: "在人群中，你感觉：",
+                options: [
+                    { text: "如鱼得水，兴奋不已", dimension: "EI", value: 1 },
+                    { text: "有点不自在，想要独处", dimension: "EI", value: -1 }
+                ]
+            },
+            {
+                id: 10,
+                text: "你对什么更感兴趣：",
+                options: [
+                    { text: "现实中真实存在的事物", dimension: "SN", value: 1 },
+                    { text: "想象中可能出现的事物", dimension: "SN", value: -1 }
+                ]
+            },
+            {
+                id: 11,
+                text: "你更看重：",
+                options: [
+                    { text: "公平和正义", dimension: "TF", value: 1 },
+                    { text: "和谐和同理心", dimension: "TF", value: -1 }
+                ]
+            },
+            {
+                id: 12,
+                text: "旅行时，你更喜欢：",
+                options: [
+                    { text: "制定详细的行程计划", dimension: "JP", value: 1 },
+                    { text: "随性探索，随遇而安", dimension: "JP", value: -1 }
+                ]
+            },
+            {
+                id: 13,
+                text: "讲述事情时，你倾向于：",
+                options: [
+                    { text: "热情洋溢，手势丰富", dimension: "EI", value: 1 },
+                    { text: "冷静平和，语言简洁", dimension: "EI", value: -1 }
+                ]
+            },
+            {
+                id: 14,
+                text: "解决问题时，你擅长：",
+                options: [
+                    { text: "用已验证的方法解决", dimension: "SN", value: 1 },
+                    { text: "想出新的解决方案", dimension: "SN", value: -1 }
+                ]
+            },
+            {
+                id: 15,
+                text: "你更像是一个：",
+                options: [
+                    { text: "铁面无私的法官", dimension: "TF", value: 1 },
+                    { text: "温柔体贴的社工", dimension: "TF", value: -1 }
+                ]
+            },
+            {
+                id: 16,
+                text: "对于突发情况，你：",
+                options: [
+                    { text: "感到焦虑，希望有预案", dimension: "JP", value: 1 },
+                    { text: "觉得刺激，灵活应对", dimension: "JP", value: -1 }
+                ]
+            },
+            {
+                id: 17,
+                text: "独处对你来说是：",
+                options: [
+                    { text: "偶尔需要，太多会闷", dimension: "EI", value: 1 },
+                    { text: "不可或缺，充电时间", dimension: "EI", value: -1 }
+                ]
+            },
+            {
+                id: 18,
+                text: "你更相信：",
+                options: [
+                    { text: "经验和实践", dimension: "SN", value: 1 },
+                    { text: "直觉和灵感", dimension: "SN", value: -1 }
+                ]
+            },
+            {
+                id: 19,
+                text: "做决定时，你更看重：",
+                options: [
+                    { text: "道理和逻辑", dimension: "TF", value: 1 },
+                    { text: "情感和人情", dimension: "TF", value: -1 }
+                ]
+            },
+            {
+                id: 20,
+                text: "你更享受：",
+                options: [
+                    { text: "完成一件事的成就感", dimension: "JP", value: 1 },
+                    { text: "探索过程的新鲜感", dimension: "JP", value: -1 }
+                ]
+            }
+        ];
+        
+        const mbtiTypes = {
+            "INTJ": {
+                name: "建筑师",
+                description: "富有想象力和战略性思维的规划者，一切皆在计划之中。你是一个独立思考者，有着清晰的愿景和实现目标的决心。",
+                strengths: ["战略思维", "独立自主", "意志坚定", "高标准", "知识渊博"],
+                weaknesses: ["过于分析", "社交困难", "过度自信", "不耐烦", "情感表达困难"],
+                careers: ["科学家", "系统分析师", "投资银行家", "项目经理", "战略顾问"],
+                color: "from-indigo-600 to-purple-600",
+                bgColor: "bg-gradient-to-br from-indigo-50 to-purple-50"
+            },
+            "INTP": {
+                name: "逻辑学家",
+                description: "创新的发明家，对知识有着永不满足的渴望。你喜欢理论和抽象概念，擅长解决复杂问题。",
+                strengths: ["分析能力", "原创思维", "开放心态", "客观公正", "诚实直接"],
+                weaknesses: ["社交退缩", "不切实际", "拖延症", "不敏感", "完美主义"],
+                careers: ["程序员", "数学家", "哲学家", "研究人员", "学术教授"],
+                color: "from-blue-600 to-cyan-600",
+                bgColor: "bg-gradient-to-br from-blue-50 to-cyan-50"
+            },
+            "ENTJ": {
+                name: "指挥官",
+                description: "大胆、富有想象力且意志坚强的领导者，总能找到或创造解决方法。你天生具有领袖魅力，善于组织和激励他人。",
+                strengths: ["高效执行", "精力充沛", "自信果断", "战略眼光", "魅力领导"],
+                weaknesses: ["固执己见", "不耐烦", "傲慢", "冷酷", "不容异议"],
+                careers: ["CEO", "律师", "企业家", "管理顾问", "政治家"],
+                color: "from-red-600 to-orange-600",
+                bgColor: "bg-gradient-to-br from-red-50 to-orange-50"
+            },
+            "ENTP": {
+                name: "辩论家",
+                description: "聪明好奇的思想家，不会放过任何智力挑战。你喜欢辩论，善于从多个角度看问题。",
+                strengths: ["知识渊博", "快速思维", "原创性强", "魅力十足", "精力充沛"],
+                weaknesses: ["好争论", "不切实际", "难以集中", "不敏感", "不耐烦"],
+                careers: ["律师", "发明家", "企业家", "创意总监", "政治分析师"],
+                color: "from-yellow-500 to-orange-500",
+                bgColor: "bg-gradient-to-br from-yellow-50 to-orange-50"
+            },
+            "INFJ": {
+                name: "提倡者",
+                description: "安静而神秘，同时非常鼓舞人心且不知疲倦的理想主义者。你有着深刻的洞察力和帮助他人的强烈愿望。",
+                strengths: ["创造力", "洞察力", "有原则", "热情", "利他主义"],
+                weaknesses: ["敏感", "完美主义", "回避冲突", "私密性强", "容易倦怠"],
+                careers: ["心理咨询师", "作家", "人力资源", "非营利组织", "医生"],
+                color: "from-violet-600 to-fuchsia-600",
+                bgColor: "bg-gradient-to-br from-violet-50 to-fuchsia-50"
+            },
+            "INFP": {
+                name: "调停者",
+                description: "诗意、善良的利他主义者，总是热切地为正义事业提供帮助。你有着丰富的内心世界和强烈的价值观。",
+                strengths: ["理想主义", "寻求和谐", "开放包容", "创造力", "热情专注"],
+                weaknesses: ["过于理想化", "不切实际", "自我封闭", "脆弱敏感", "缺乏方向"],
+                careers: ["作家", "艺术家", "心理学家", "教师", "社会工作者"],
+                color: "from-pink-500 to-rose-500",
+                bgColor: "bg-gradient-to-br from-pink-50 to-rose-50"
+            },
+            "ENFJ": {
+                name: "主人公",
+                description: "富有魅力和鼓舞人心的领导者，能够迷住他们的听众。你天生善于理解他人并帮助他们发挥潜能。",
+                strengths: ["容忍", "可靠", "有魅力", "利他无私", "天生领袖"],
+                weaknesses: ["过度理想化", "太无私", "过度敏感", "优柔寡断", "自责"],
+                careers: ["教师", "人力资源", "政治家", "销售经理", "公关专家"],
+                color: "from-emerald-500 to-teal-500",
+                bgColor: "bg-gradient-to-br from-emerald-50 to-teal-50"
+            },
+            "ENFP": {
+                name: "竞选者",
+                description: "热情、有创造力和社交能力的自由精神者，总能找到微笑的理由。你充满活力，喜欢探索新的可能性。",
+                strengths: ["好奇心", "热情洋溢", "善于交际", "精力充沛", "乐观向上"],
+                weaknesses: ["不切实际", "难以集中", "过度思考", "容易紧张", "不够独立"],
+                careers: ["记者", "演员", "咨询师", "市场营销", "创业者"],
+                color: "from-amber-500 to-yellow-500",
+                bgColor: "bg-gradient-to-br from-amber-50 to-yellow-50"
+            },
+            "ISTJ": {
+                name: "物流师",
+                description: "实际且注重事实的个人，其可靠性不容置疑。你做事有条理，重视传统和责任。",
+                strengths: ["诚实正直", "意志坚定", "责任感强", "冷静理性", "实用主义"],
+                weaknesses: ["固执", "不敏感", "总是按规矩", "缺乏变通", "责备自己"],
+                careers: ["会计师", "审计员", "军官", "法官", "项目经理"],
+                color: "from-slate-600 to-gray-600",
+                bgColor: "bg-gradient-to-br from-slate-50 to-gray-100"
+            },
+            "ISFJ": {
+                name: "守卫者",
+                description: "非常专注且热心的保护者，时刻准备着保护所爱之人。你温柔体贴，总是把他人的需求放在首位。",
+                strengths: ["支持性", "可靠", "有耐心", "善于观察", "热情周到"],
+                weaknesses: ["害羞", "过于谦虚", "压抑情感", "不愿改变", "过于利他"],
+                careers: ["护士", "教师", "社工", "行政助理", "图书管理员"],
+                color: "from-rose-500 to-pink-500",
+                bgColor: "bg-gradient-to-br from-rose-50 to-pink-50"
+            },
+            "ESTJ": {
+                name: "总经理",
+                description: "出色的管理者，在管理事物或人员方面无与伦比。你务实有条理，喜欢建立秩序。",
+                strengths: ["专注", "意志坚定", "直接坦率", "诚实正直", "组织能力强"],
+                weaknesses: ["固执", "不敏感", "控制欲强", "缺乏灵活性", "过于注重社会地位"],
+                careers: ["商业管理", "军官", "法官", "金融分析师", "学校管理员"],
+                color: "from-blue-700 to-indigo-700",
+                bgColor: "bg-gradient-to-br from-blue-50 to-indigo-50"
+            },
+            "ESFJ": {
+                name: "执政官",
+                description: "极有同情心、爱交际、受欢迎的人，总是热心帮助别人。你喜欢社交，并总是确保每个人都开心。",
+                strengths: ["忠诚度高", "敏感", "温暖热情", "善于连接", "实用主义"],
+                weaknesses: ["过于关注社会地位", "不灵活", "过于无私", "过于敏感", "不愿创新"],
+                careers: ["销售代表", "护士", "教师", "社会工作者", "活动策划"],
+                color: "from-green-500 to-emerald-500",
+                bgColor: "bg-gradient-to-br from-green-50 to-emerald-50"
+            },
+            "ISTP": {
+                name: "鉴赏家",
+                description: "大胆而实际的实验家，擅长使用各种工具。你动手能力强，喜欢解决实际问题。",
+                strengths: ["乐观积极", "创造力", "务实", "自发性", "理性分析"],
+                weaknesses: ["固执", "不敏感", "私密", "容易无聊", "冒险行为"],
+                careers: ["工程师", "机械师", "飞行员", "运动员", "法医"],
+                color: "from-zinc-600 to-neutral-600",
+                bgColor: "bg-gradient-to-br from-zinc-50 to-neutral-100"
+            },
+            "ISFP": {
+                name: "探险家",
+                description: "灵活有魅力的艺术家，随时准备探索和体验新事物。你温和敏感，热爱美与和谐。",
+                strengths: ["有魅力", "敏感", "想象力", "热情", "好奇心"],
+                weaknesses: ["过于独立", "不可预测", "容易紧张", "自尊心低", "难以规划"],
+                careers: ["艺术家", "设计师", "厨师", "摄影师", "理疗师"],
+                color: "from-teal-500 to-cyan-500",
+                bgColor: "bg-gradient-to-br from-teal-50 to-cyan-50"
+            },
+            "ESTP": {
+                name: "企业家",
+                description: "聪明、精力充沛、善于感知的人，真正喜欢生活在危险边缘。你行动力强，喜欢刺激和挑战。",
+                strengths: ["大胆", "理性", "原创", "直接", "善于社交"],
+                weaknesses: ["不敏感", "不耐烦", "冒险", "不守承诺", "不善理论"],
+                careers: ["企业家", "销售", "运动员", "紧急救援", "股票交易员"],
+                color: "from-orange-500 to-red-500",
+                bgColor: "bg-gradient-to-br from-orange-50 to-red-50"
+            },
+            "ESFP": {
+                name: "表演者",
+                description: "自发的、精力充沛的表演者，生活从不无聊在他们身边。你热爱成为焦点，喜欢给他人带来快乐。",
+                strengths: ["大胆", "原创", "乐观", "实用", "善于观察"],
+                weaknesses: ["敏感", "避免冲突", "容易无聊", "难以集中", "不善规划"],
+                careers: ["活动策划", "销售", "演员", "健身教练", "导游"],
+                color: "from-fuchsia-500 to-pink-500",
+                bgColor: "bg-gradient-to-br from-fuchsia-50 to-pink-50"
+            }
+        };
+        
+        let currentQuestion = 0;
+        let answers = new Array(questions.length).fill(null);
+        let scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+        
+        function startTest() {
+            currentQuestion = 0;
+            answers = new Array(questions.length).fill(null);
+            scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+            
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('test-view').classList.remove('hidden');
+            document.getElementById('result-view').classList.add('hidden');
+            
+            renderQuestion();
+        }
+        
+        function renderQuestion() {
+            const question = questions[currentQuestion];
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            
+            document.getElementById('progress-text').textContent = `问题 ${currentQuestion + 1} / ${questions.length}`;
+            document.getElementById('progress-percent').textContent = `${Math.round(progress)}%`;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+            document.getElementById('question-tag').textContent = `第 ${currentQuestion + 1} 题`;
+            document.getElementById('question-text').textContent = question.text;
+            
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = `option-btn w-full p-6 rounded-2xl text-left text-lg font-medium border-2 transition-all ${
+                    answers[currentQuestion] === index 
+                        ? 'selected border-purple-500 bg-purple-50 text-purple-700' 
+                        : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300 hover:bg-purple-50/50'
+                }`;
+                btn.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <span class="w-10 h-10 rounded-full ${answers[currentQuestion] === index ? 'bg-purple-500 text-white' : 'bg-gray-100 text-gray-500'} flex items-center justify-center font-bold">
+                            ${answers[currentQuestion] === index ? '✓' : String.fromCharCode(65 + index)}
+                        </span>
+                        <span>${option.text}</span>
+                    </div>
+                `;
+                btn.onclick = () => selectOption(index);
+                optionsContainer.appendChild(btn);
+            });
+            
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            
+            prevBtn.disabled = currentQuestion === 0;
+            
+            if (answers[currentQuestion] !== null) {
+                nextBtn.disabled = false;
+                nextBtn.textContent = currentQuestion === questions.length - 1 ? '查看结果 ✨' : '下一题 →';
+            } else {
+                nextBtn.disabled = true;
+                nextBtn.textContent = '下一题 →';
+            }
+        }
+        
+        function selectOption(index) {
+            answers[currentQuestion] = index;
+            renderQuestion();
+        }
+        
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                renderQuestion();
+            }
+        }
+        
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                renderQuestion();
+            } else {
+                calculateResult();
+            }
+        }
+        
+        function calculateResult() {
+            scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+            
+            questions.forEach((question, index) => {
+                const answer = answers[index];
+                if (answer !== null) {
+                    const option = question.options[answer];
+                    const dimension = option.dimension;
+                    const value = option.value;
+                    
+                    if (dimension === 'EI') {
+                        if (value > 0) scores.E++;
+                        else scores.I++;
+                    } else if (dimension === 'SN') {
+                        if (value > 0) scores.S++;
+                        else scores.N++;
+                    } else if (dimension === 'TF') {
+                        if (value > 0) scores.T++;
+                        else scores.F++;
+                    } else if (dimension === 'JP') {
+                        if (value > 0) scores.J++;
+                        else scores.P++;
+                    }
+                }
+            });
+            
+            const resultType = 
+                (scores.E >= scores.I ? 'E' : 'I') +
+                (scores.S >= scores.N ? 'S' : 'N') +
+                (scores.T >= scores.F ? 'T' : 'F') +
+                (scores.J >= scores.P ? 'J' : 'P');
+            
+            showResult(resultType);
+        }
+        
+        function showResult(type) {
+            const typeData = mbtiTypes[type];
+            
+            document.getElementById('test-view').classList.add('hidden');
+            document.getElementById('result-view').classList.remove('hidden');
+            
+            const resultContainer = document.getElementById('result-container');
+            resultContainer.className = `min-h-screen ${typeData.bgColor}`;
+            
+            resultContainer.innerHTML = `
+                <div class="container mx-auto px-6 py-12">
+                    <div class="max-w-4xl mx-auto">
+                        <div class="text-center mb-12 bounce-in">
+                            <div class="inline-block px-6 py-2 bg-white/80 backdrop-blur rounded-full text-gray-600 mb-6">
+                                🎉 测试完成！
+                            </div>
+                            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">你是</h1>
+                            <div class="text-7xl md:text-9xl font-extrabold bg-gradient-to-r ${typeData.color} bg-clip-text text-transparent">
+                                ${type}
+                            </div>
+                            <p class="text-2xl md:text-3xl font-semibold text-gray-700 mt-4">${typeData.name}</p>
+                        </div>
+                        
+                        <div class="glass-card rounded-3xl p-8 md:p-10 shadow-xl mb-8 fade-up" style="animation-delay: 0.2s;">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-3">
+                                <span class="text-3xl">📖</span>
+                                性格解析
+                            </h2>
+                            <p class="text-lg text-gray-600 leading-relaxed">
+                                ${typeData.description}
+                            </p>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-6 mb-8">
+                            <div class="glass-card rounded-3xl p-8 shadow-xl fade-up" style="animation-delay: 0.4s;">
+                                <h3 class="text-xl font-bold text-gray-800 mb-5 flex items-center gap-3">
+                                    <span class="text-2xl">💪</span>
+                                    你的优势
+                                </h3>
+                                <ul class="space-y-3">
+                                    ${typeData.strengths.map(s => `<li class="strength-item text-gray-700 text-lg">${s}</li>`).join('')}
+                                </ul>
+                            </div>
+                            
+                            <div class="glass-card rounded-3xl p-8 shadow-xl fade-up" style="animation-delay: 0.6s;">
+                                <h3 class="text-xl font-bold text-gray-800 mb-5 flex items-center gap-3">
+                                    <span class="text-2xl">🌱</span>
+                                    成长空间
+                                </h3>
+                                <ul class="space-y-3">
+                                    ${typeData.weaknesses.map(w => `<li class="weakness-item text-gray-700 text-lg">${w}</li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-card rounded-3xl p-8 shadow-xl mb-10 fade-up" style="animation-delay: 0.8s;">
+                            <h3 class="text-xl font-bold text-gray-800 mb-5 flex items-center gap-3">
+                                <span class="text-2xl">💼</span>
+                                适合职业
+                            </h3>
+                            <div class="flex flex-wrap gap-3">
+                                ${typeData.careers.map(c => `
+                                    <span class="px-5 py-2 bg-gradient-to-r ${typeData.color} text-white rounded-full font-medium">
+                                        ${c}
+                                    </span>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center fade-up" style="animation-delay: 1s;">
+                            <button onclick="restartTest()" class="primary-btn text-white text-lg font-semibold px-10 py-4 rounded-full">
+                                🔄 重新测试
+                            </button>
+                            <button onclick="shareResult('${type}')" class="px-10 py-4 bg-white text-gray-700 text-lg font-semibold rounded-full border-2 border-gray-200 hover:border-purple-300 transition-all">
+                                📤 分享结果
+                            </button>
+                        </div>
+                        
+                        <div class="mt-12 text-center fade-up" style="animation-delay: 1.2s;">
+                            <p class="text-gray-500 mb-6">想了解其他性格类型？</p>
+                            <div class="grid grid-cols-4 sm:grid-cols-8 gap-2 max-w-2xl mx-auto">
+                                ${Object.keys(mbtiTypes).map(t => `
+                                    <button onclick="showTypeInfo('${t}')" class="type-card px-3 py-2 rounded-xl font-bold ${t === type ? `bg-gradient-to-r ${typeData.color} text-white` : 'bg-white text-gray-600 hover:bg-gray-100'} border border-gray-200">
+                                        ${t}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function showTypeInfo(type) {
+            calculateResult();
+            showResult(type);
+        }
+        
+        function shareResult(type) {
+            const text = `我刚做了 MBTI 性格测试，结果是 ${type} - ${mbtiTypes[type].name}！快来发现你的性格类型吧 ✨`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: '我的 MBTI 测试结果',
+                    text: text,
+                }).catch(err => console.log('分享失败', err));
+            } else {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('结果已复制到剪贴板！');
+                }).catch(() => {
+                    alert('你的结果是：' + type + ' - ' + mbtiTypes[type].name);
+                });
+            }
+        }
+        
+        function restartTest() {
+            document.getElementById('result-view').classList.add('hidden');
+            document.getElementById('home-view').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
