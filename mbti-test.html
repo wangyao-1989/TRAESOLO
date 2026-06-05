@@ -147,6 +147,24 @@
         .type-card:hover {
             transform: translateY(-5px);
         }
+        
+        .avatar-container {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .avatar-bounce {
+            animation: avatar-bounce 3s ease-in-out infinite;
+        }
+        
+        @keyframes avatar-bounce {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-10px) scale(1.02); }
+        }
+        
+        .avatar-glow {
+            filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.4));
+        }
     </style>
 </head>
 <body class="min-h-screen">
