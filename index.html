@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>猫抓老鼠</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      overflow: hidden;
+    }
+    [data-composition-id="root"] {
+      width: 1920px;
+      height: 1080px;
+      position: relative;
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    .scene {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    .scene-content {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 120px;
+      gap: 40px;
+      box-sizing: border-box;
+      position: relative;
+    }
+    
+    /* 配色方案 */
+    :root {
+      --bg: #FFF9E6;
+      --fg: #3D2914;
+      --accent: #FF7A00;
+      --cat: #FFA64D;
+      --mouse: #8B7355;
+    }
+    
+    /* 场景1 - 标题 */
+    #s1 {
+      background-color: var(--bg);
+    }
+    #s1 .title {
+      font-size: 120px;
+      font-weight: 900;
+      color: var(--fg);
+      text-align: center;
+    }
+    #s1 .subtitle {
+      font-size: 48px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    
+    /* 猫和老鼠的通用样式 */
+    .cat, .mouse {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .cat-body {
+      width: 180px;
+      height: 160px;
+      background: var(--cat);
+      border-radius: 90px 90px 60px 60px;
+      position: relative;
+    }
+    .cat-ears {
+      position: absolute;
+      top: -40px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+    .cat-ear {
+      width: 50px;
+      height: 60px;
+      background: var(--cat);
+      border-radius: 25px 25px 0 0;
+    }
+    .cat-eyes {
+      position: absolute;
+      top: 40px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+    }
+    .cat-eye {
+      width: 35px;
+      height: 35px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .cat-pupil {
+      width: 15px;
+      height: 15px;
+      background: var(--fg);
+      border-radius: 50%;
+    }
+    .cat-nose {
+      position: absolute;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 15px;
+      background: #FF8C8C;
+      border-radius: 50%;
+    }
+    .cat-mouth {
+      position: absolute;
+      top: 95px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 20px;
+      border-bottom: 4px solid var(--fg);
+      border-radius: 0 0 20px 20px;
+    }
+    .cat-whiskers {
+      position: absolute;
+      top: 90px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 10px;
+    }
+    .cat-whisker {
+      width: 50px;
+      height: 4px;
+      background: var(--fg);
+    }
+    .cat-tail {
+      position: absolute;
+      bottom: 40px;
+      right: -40px;
+      width: 60px;
+      height: 20px;
+      background: var(--cat);
+      border-radius: 10px;
+    }
+    
+    .mouse-body {
+      width: 100px;
+      height: 80px;
+      background: var(--mouse);
+      border-radius: 50px;
+      position: relative;
+    }
+    .mouse-ears {
+      position: absolute;
+      top: -25px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 15px;
+    }
+    .mouse-ear {
+      width: 30px;
+      height: 35px;
+      background: var(--mouse);
+      border-radius: 15px;
+    }
+    .mouse-eye {
+      position: absolute;
+      top: 25px;
+      width: 15px;
+      height: 15px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .mouse-eye.left { left: 25px; }
+    .mouse-eye.right { right: 25px; }
+    .mouse-pupil {
+      width: 7px;
+      height: 7px;
+      background: var(--fg);
+      border-radius: 50%;
+    }
+    .mouse-nose {
+      position: absolute;
+      top: 45px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 12px;
+      height: 10px;
+      background: #FFB6C1;
+      border-radius: 50%;
+    }
+    .mouse-tail {
+      position: absolute;
+      top: 35px;
+      left: -50px;
+      width: 60px;
+      height: 10px;
+      background: var(--mouse);
+      border-radius: 5px;
+    }
+    
+    /* 场景2 - 追逐 */
+    #s2 {
+      background: linear-gradient(180deg, #87CEEB 0%, #98FB98 100%);
+    }
+    #s2 .ground {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 200px;
+      background: #8B7355;
+    }
+    #s2 .grass {
+      position: absolute;
+      bottom: 200px;
+      width: 100%;
+      height: 50px;
+      background: #228B22;
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-end;
+    }
+    #s2 .grass-blade {
+      width: 20px;
+      height: 40px;
+      background: #32CD32;
+      border-radius: 10px 10px 0 0;
+    }
+    
+    /* 场景3 - 高潮 */
+    #s3 {
+      background: #FFF9E6;
+    }
+    #s3 .action-text {
+      font-size: 140px;
+      font-weight: 900;
+      color: var(--accent);
+    }
+    
+    /* 场景4 - 结尾 */
+    #s4 {
+      background: var(--bg);
+    }
+    #s4 .end-text {
+      font-size: 72px;
+      color: var(--fg);
+      text-align: center;
+    }
+    #s4 .cat-confused {
+      position: absolute;
+      top: 60%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    
+    /* 装饰性元素 */
+    .deco-circle {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.1;
+    }
+    .deco-circle.small {
+      width: 200px;
+      height: 200px;
+      background: var(--accent);
+    }
+    .deco-circle.large {
+      width: 400px;
+      height: 400px;
+      background: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <div data-composition-id="root" data-width="1920" data-height="1080">
+    <!-- 场景1：标题 -->
+    <div id="s1" class="scene clip" data-start="0" data-duration="3" data-track-index="0">
+      <div class="scene-content">
+        <div class="deco-circle large" style="top: 100px; left: 100px;"></div>
+        <div class="deco-circle small" style="bottom: 200px; right: 150px;"></div>
+        
+        <div id="s1-title" class="title">猫抓老鼠</div>
+        <div id="s1-subtitle" class="subtitle">一场精彩的追逐</div>
+        
+        <div id="s1-cat" class="cat" style="bottom: 150px; left: 300px;">
+          <div class="cat-body">
+            <div class="cat-ears">
+              <div class="cat-ear"></div>
+              <div class="cat-ear"></div>
+            </div>
+            <div class="cat-eyes">
+              <div class="cat-eye"><div class="cat-pupil"></div></div>
+              <div class="cat-eye"><div class="cat-pupil"></div></div>
+            </div>
+            <div class="cat-nose"></div>
+            <div class="cat-mouth"></div>
+            <div class="cat-whiskers">
+              <div class="cat-whisker"></div>
+              <div class="cat-whisker"></div>
+            </div>
+            <div class="cat-tail"></div>
+          </div>
+        </div>
+        <div id="s1-mouse" class="mouse" style="bottom: 200px; right: 300px;">
+          <div class="mouse-body">
+            <div class="mouse-ears">
+              <div class="mouse-ear"></div>
+              <div class="mouse-ear"></div>
+            </div>
+            <div class="mouse-eye left"><div class="mouse-pupil"></div></div>
+            <div class="mouse-eye right"><div class="mouse-pupil"></div></div>
+            <div class="mouse-nose"></div>
+            <div class="mouse-tail"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 场景2：追逐 -->
+    <div id="s2" class="scene clip" data-start="3" data-duration="3" data-track-index="0">
+      <div class="ground"></div>
+      <div class="grass">
+        <div class="grass-blade"></div>
+        <div class="grass-blade"></div>
+        <div class="grass-blade"></div>
+        <div class="grass-blade"></div>
+        <div class="grass-blade"></div>
+        <div class="grass-blade"></div>
+        <div class="grass-blade"></div>
+        <div class="grass-blade"></div>
+        <div class="grass-blade"></div>
+        <div class="grass-blade"></div>
+      </div>
+      
+      <div id="s2-mouse" class="mouse" style="top: 500px; left: 200px;">
+        <div class="mouse-body">
+          <div class="mouse-ears">
+            <div class="mouse-ear"></div>
+            <div class="mouse-ear"></div>
+          </div>
+          <div class="mouse-eye left"><div class="mouse-pupil"></div></div>
+          <div class="mouse-eye right"><div class="mouse-pupil"></div></div>
+          <div class="mouse-nose"></div>
+          <div class="mouse-tail"></div>
+        </div>
+      </div>
+      
+      <div id="s2-cat" class="cat" style="top: 450px; left: 50px;">
+        <div class="cat-body">
+          <div class="cat-ears">
+            <div class="cat-ear"></div>
+            <div class="cat-ear"></div>
+          </div>
+          <div class="cat-eyes">
+            <div class="cat-eye"><div class="cat-pupil"></div></div>
+            <div class="cat-eye"><div class="cat-pupil"></div></div>
+          </div>
+          <div class="cat-nose"></div>
+          <div class="cat-mouth"></div>
+          <div class="cat-whiskers">
+            <div class="cat-whisker"></div>
+            <div class="cat-whisker"></div>
+          </div>
+          <div class="cat-tail"></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 场景3：高潮 -->
+    <div id="s3" class="scene clip" data-start="6" data-duration="2" data-track-index="0">
+      <div class="scene-content">
+        <div class="deco-circle large" style="top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+        
+        <div id="s3-text" class="action-text">噗！</div>
+      </div>
+    </div>
+    
+    <!-- 场景4：结尾 -->
+    <div id="s4" class="scene clip" data-start="8" data-duration="2" data-track-index="0">
+      <div class="scene-content">
+        <div class="deco-circle small" style="top: 150px; right: 200px;"></div>
+        
+        <div id="s4-text1" class="end-text">老鼠逃跑了！</div>
+        <div id="s4-text2" class="end-text" style="margin-top: 20px; font-size: 48px; color: var(--accent);">下次再见~</div>
+        
+        <div id="s4-cat" class="cat cat-confused">
+          <div class="cat-body">
+            <div class="cat-ears">
+              <div class="cat-ear"></div>
+              <div class="cat-ear"></div>
+            </div>
+            <div class="cat-eyes">
+              <div class="cat-eye"><div class="cat-pupil"></div></div>
+              <div class="cat-eye"><div class="cat-pupil"></div></div>
+            </div>
+            <div class="cat-nose"></div>
+            <div class="cat-mouth"></div>
+            <div class="cat-whiskers">
+              <div class="cat-whisker"></div>
+              <div class="cat-whisker"></div>
+            </div>
+            <div class="cat-tail"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script>
+    window.__timelines = window.__timelines || {};
+    var tl = gsap.timeline({ paused: true });
+    
+    // 场景1动画
+    tl.from("#s1-title", { y: -100, opacity: 0, duration: 0.8, ease: "power3.out" }, 0.2);
+    tl.from("#s1-subtitle", { y: 50, opacity: 0, duration: 0.6, ease: "power2.out" }, 0.5);
+    tl.from("#s1-cat", { x: -200, opacity: 0, duration: 0.7, ease: "power3.out" }, 0.7);
+    tl.from("#s1-mouse", { x: 200, opacity: 0, duration: 0.7, ease: "power3.out" }, 0.9);
+    
+    // 场景2动画 - 追逐
+    tl.to("#s2-mouse", { x: 1500, duration: 2.5, ease: "power1.in" }, 3.1);
+    tl.to("#s2-cat", { x: 1500, duration: 2.5, ease: "power1.in" }, 3.2);
+    
+    // 场景3动画
+    tl.from("#s3-text", { scale: 0, rotation: -180, opacity: 0, duration: 0.6, ease: "back.out" }, 6.1);
+    tl.to("#s3-text", { scale: 1.2, duration: 0.4, ease: "power2.out" }, 6.4);
+    
+    // 场景4动画
+    tl.from("#s4-text1", { y: -80, opacity: 0, duration: 0.6, ease: "power3.out" }, 8.1);
+    tl.from("#s4-cat", { scale: 0.5, opacity: 0, duration: 0.7, ease: "back.out" }, 8.3);
+    tl.from("#s4-text2", { y: 50, opacity: 0, duration: 0.5, ease: "power2.out" }, 8.6);
+    
+    // 场景转场
+    tl.to("#s1", { opacity: 0, duration: 0.4 }, 2.6);
+    tl.fromTo("#s2", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 3.0);
+    tl.to("#s2", { opacity: 0, duration: 0.3 }, 5.7);
+    tl.fromTo("#s3", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 6.0);
+    tl.to("#s3", { opacity: 0, duration: 0.3 }, 7.7);
+    tl.fromTo("#s4", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 8.0);
+    
+    window.__timelines["root"] = tl;
+  </script>
+</body>
+</html>
